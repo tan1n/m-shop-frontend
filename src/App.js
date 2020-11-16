@@ -15,6 +15,8 @@ function App() {
     window.MessengerExtensions.getSupportedFeatures(function success(result) {
       let features = result.supported_features;
       document.write(JSON.stringify(features))
+    }, (err) => {
+      document.write(JSON.stringify(err))
     })
   }
 
