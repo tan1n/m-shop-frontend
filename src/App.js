@@ -15,6 +15,13 @@ function App() {
           console.log(err)
         }
       )
+    window.MessengerExtensions.getSupportedFeatures(function success(result) {
+      let features = result.supported_features;
+      console.log('features', features)
+    }, function error(err) {
+      // error retrieving supported features
+      console.log('error in getting features')
+    });
   };
 
   return (
