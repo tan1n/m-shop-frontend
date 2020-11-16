@@ -6,23 +6,17 @@ import Shop from './Components/Shop';
 function App() {
   window.extAsyncInit = function () {
     // the Messenger Extensions JS SDK is done loading 
-    window.MessengerExtensions
-      .getContext('1396246627246563',
-        (thread_context) => {
-          console.log(thread_context)
-        },
-        (err) => {
-          console.log(err)
-        }
-      )
+    window.MessengerExtensions.getContext('1396246627246563', (thread_context) => {
+      document.write(JSON.stringify(thread_context))
+    }, (err) => {
+      document.write(JSON.stringify(err))
+    })
+
     window.MessengerExtensions.getSupportedFeatures(function success(result) {
       let features = result.supported_features;
-      console.log('features', features)
-    }, function error(err) {
-      // error retrieving supported features
-      console.log('error in getting features')
-    });
-  };
+      document.write(JSON.stringify(features))
+    })
+  }
 
   return (
     <Router>
