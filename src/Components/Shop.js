@@ -8,7 +8,9 @@ import NotFound from './NotFound';
 
 export default function Shop() {
 
-    const { id } = useParams();
+    const { shopId } = useParams();
+
+    const appId = process.env.REACT_APP_FB_APP_ID;
 
     const [shop, setShop] = useState({ id: '', name: '', description: '', products: [] });
 
@@ -20,10 +22,15 @@ export default function Shop() {
 
     const [orderForm, setOrderFrom] = useState(false);
 
-    const [user, setUser] = useForm({ name: '', phone: '', address: '' });
+    const [user, setUser, setUserState] = useForm({ name: '', phone: '', district: '', address: '', psId: '', profile_pic: '' });
 
-    let shopUrl = process.env.REACT_APP_API_URL + `shop/${id}/products`;
+    const [payment, setPayment] = useState({ transaction_id: '', payment_type: '', payment_no: '' })
 
+    const shopUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/products`;
+
+    const [isLoading, setIsLoading] = useState({ status: false, msg: '' });
+
+    //Get shop data
     useEffect(() => {
         fetch(shopUrl)
             .then((res) => {
@@ -33,14 +40,42 @@ export default function Shop() {
             .then(({ data }) => {
                 setShop(data);
             })
-            .catch((err) => setError((error) => !error));
-    }, [id, shopUrl]);
+            .catch((err) => setError((error) => true));
+    }, [shopId, shopUrl]);
 
-
+    //Set `isComplete` button to disabled depending on cart changes
     useEffect(() => {
         setIscomplete(() => cart.length === 0 ? true : false)
     }, [cart]);
 
+    //Get customer profile from facebook through our api and set the state
+    useEffect(() => {
+        let customerUrl = '';
+        //Messenger extension is loaded 
+        window.extAsyncInit = () => {
+            window.MessengerExtensions.getContext(appId, (context) => {
+                customerUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/customer/${context.psid}`
+            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/customer/123` })
+
+            //Get profile
+            fetch(customerUrl)
+                .then(res => res.json())
+                .then(({ data }) => {
+                    //Set state of customer profile
+                    setUserState((prev) => {
+                        return {
+                            ...prev,
+                            name: data.name,
+                            psId: data.id,
+                            profile_pic: data.profile_pic
+                        }
+                    })
+                })
+                .catch(err => console.log(err))
+        }
+    }, [])
+
+    //Options for product component
     const cartOptions = {
         addToCart: (data) => {
             setCart((prevCart) => [...prevCart, data]);
@@ -53,6 +88,7 @@ export default function Shop() {
         }
     }
 
+    //Total amount of price of the cart
     const total = () => {
         return cart.reduce((current, item) => {
             let price = item.has_discount ? item.unit_price - item.discount : item.unit_price;
@@ -60,6 +96,7 @@ export default function Shop() {
         }, 0);
     };
 
+    //Style for shop component
     const styles = {
         line: {
             borderBottom: '1px solid black',
@@ -71,10 +108,13 @@ export default function Shop() {
         }
     }
 
+    //Show orderForm component from `complete order` button
     const handleComplete = () => setOrderFrom(prev => !prev);
 
+    //Submit order 
     const submitOrder = () => {
-
+        setIsLoading((prev) => ({ ...prev, status: true }))
+        //Count proucts from cart
         let countProducts = (cart) => {
             let newCart = []
             cart.forEach((value) => {
@@ -84,15 +124,18 @@ export default function Shop() {
             return newCart;
         }
 
+        //Data to submit at api
         let data = {
             customer: { ...user },
             purchases: countProducts(cart),
-            paymentInfo: { transactionId: '', paymentType: 1 },
+            paymentInfo: { ...payment },
             shopId: shop.id
         }
-        //post data
+
+        //Api url
         let orderUrl = process.env.REACT_APP_API_URL + 'order';
 
+        //Fetch options
         let fetchOptions = {
             method: 'post',
             headers: {
@@ -101,28 +144,48 @@ export default function Shop() {
             body: JSON.stringify(data)
         }
 
-        console.log(data)
-
+        //Request using fetch 
         fetch(orderUrl, fetchOptions)
             .then(response => response.json())
-            .then(data => {
-                console.log(data);
+            .then(({ data }) => {
+                //If order is successfully posted
+                console.log(data)
+                if (data === 'Success') {
+                    setIsLoading({ status: false, msg: 'Order Place successfully' })
+                    setInterval(() => {
+                        window.MessengerExtensions.requestCloseBrowser(function success() {
+                            // webview closed
+                        }, function error(err) {
+                            // an error occurred
+                        });
+                    }, 4000);
+                } else {
+                    setIsLoading({ status: false, msg: 'Order was unsuccessfull.' })
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
     }
 
-
     return (
         <div>
             <Helmet>
                 <meta charSet="utf-8" />
                 <title>{shop.name}</title>
-                <link rel="canonical" href="http://mysite.com/example" />
             </Helmet>
             {error && <NotFound />}
-            {orderForm && <OrderForm close={handleComplete} setUser={setUser} user={user} submitOrder={submitOrder} />}
+            {orderForm &&
+                <OrderForm
+                    close={handleComplete}
+                    total={total}
+                    setUser={setUser}
+                    setPayment={setPayment}
+                    user={user}
+                    submitOrder={submitOrder}
+                    isLoading={isLoading}
+                />
+            }
             <div className="container" style={styles.shop}>
                 <div className="row">
                     <div className="col-12 mt-2 text-center">
@@ -153,8 +216,8 @@ export default function Shop() {
                             onClick={handleComplete}
                             disabled={isComplete}
                         >
-                            Complete Order (${total()} )
-                    </button>
+                            Continue ({total()}৳ )
+                        </button>
                     </div>
                 </div>
             </div>

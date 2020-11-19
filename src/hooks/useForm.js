@@ -5,10 +5,16 @@ export default function useForm(initialvalue) {
     const [values, setValues] = useState(initialvalue)
 
     return [values, (e) => {
-        setValues({
-            ...values,
-            [e.target.name]: e.target.value
-        })
-    }
-    ]
+        if (e.value) {
+            setValues({
+                ...values,
+                district: e.value
+            })
+        } else {
+            setValues({
+                ...values,
+                [e.target.name]: e.target.value
+            })
+        }
+    }, setValues]
 }

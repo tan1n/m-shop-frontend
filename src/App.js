@@ -4,26 +4,11 @@ import "bootswatch/dist/lux/bootstrap.min.css";
 import Shop from './Components/Shop';
 
 function App() {
-  window.extAsyncInit = function () {
-    // the Messenger Extensions JS SDK is done loading 
-    window.MessengerExtensions.getContext('1396246627246563', (thread_context) => {
-      document.write(JSON.stringify(thread_context))
-    }, (err) => {
-      document.write(JSON.stringify(err))
-    })
-
-    window.MessengerExtensions.getSupportedFeatures(function success(result) {
-      let features = result.supported_features;
-      document.write(JSON.stringify(features))
-    }, (err) => {
-      document.write(JSON.stringify(err))
-    })
-  }
 
   return (
     <Router>
       <Switch>
-        <Route exact path="/shop/:id">
+        <Route exact path="/shop/:shopId">
           <Shop />
         </Route>
       </Switch>

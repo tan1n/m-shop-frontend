@@ -50,8 +50,8 @@ export default function Product({ product, addToCart, removeFromCart }) {
                             <h6>{product.name}</h6>
                         </div>
                         <div className="col-12">
-                            <span style={style.price}>${product.unit_price}</span>
-                            {product.has_discount && <span>  ${product.unit_price - product.discount}</span>}
+                            <span style={style.price}>{product.unit_price}৳</span>
+                            {product.has_discount && <span>  {product.unit_price - product.discount}৳</span>}
                             <div className="row">
                                 <div className="col-5 pt-2">
                                     <button
