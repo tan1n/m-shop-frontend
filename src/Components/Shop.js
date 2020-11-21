@@ -55,7 +55,7 @@ export default function Shop() {
         window.extAsyncInit = () => {
             window.MessengerExtensions.getContext(appId, (context) => {
                 customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${context.psid}`
-            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/123` })
+            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${err}` })
 
             //Get profile
             fetch(customerUrl)
