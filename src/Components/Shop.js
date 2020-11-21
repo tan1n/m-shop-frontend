@@ -55,24 +55,23 @@ export default function Shop() {
         window.extAsyncInit = () => {
             window.MessengerExtensions.getContext(appId, (context) => {
                 customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${context.psid}`
-                // document.write(JSON.stringify(context))
-            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${err}` })
 
-            //Get profile
-            fetch(customerUrl)
-                .then(res => res.json())
-                .then(({ data }) => {
-                    //Set state of customer profile
-                    setUserState((prev) => {
-                        return {
-                            ...prev,
-                            name: data.name,
-                            psId: data.id,
-                            profile_pic: data.profile_pic
-                        }
+                //Get profile
+                fetch(customerUrl)
+                    .then(res => res.json())
+                    .then(({ data }) => {
+                        //Set state of customer profile
+                        setUserState((prev) => {
+                            return {
+                                ...prev,
+                                name: data.name,
+                                psId: data.id,
+                                profile_pic: data.profile_pic
+                            }
+                        })
                     })
-                })
-                .catch(err => console.log(err))
+                    .catch(err => console.log(err))
+            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${err}` })
         }
     })
 
