@@ -49,31 +49,28 @@ export default function Shop() {
     }, [cart]);
 
     //Get customer profile from facebook through our api and set the state
-    useEffect(() => {
-        let customerUrl = '';
-        //Messenger extension is loaded 
-        window.extAsyncInit = () => {
-            window.MessengerExtensions.getContext(appId, (context) => {
-                customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${context.psid}`
+    let customerUrl = '';
+    window.extAsyncInit = () => {
+        window.MessengerExtensions.getContext(appId, (context) => {
+            customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${context.psid}`
 
-                //Get profile
-                fetch(customerUrl)
-                    .then(res => res.json())
-                    .then(({ data }) => {
-                        //Set state of customer profile
-                        setUserState((prev) => {
-                            return {
-                                ...prev,
-                                name: data.name,
-                                psId: data.id,
-                                profile_pic: data.profile_pic
-                            }
-                        })
+            //Get profile
+            fetch(customerUrl)
+                .then(res => res.json())
+                .then(({ data }) => {
+                    //Set state of customer profile
+                    setUserState((prev) => {
+                        return {
+                            ...prev,
+                            name: data.name,
+                            psId: data.id,
+                            profile_pic: data.profile_pic
+                        }
                     })
-                    .catch(err => console.log(err))
-            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${err}` })
-        }
-    })
+                })
+                .catch(err => console.log(err))
+        }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${err}` })
+    }
 
     //Options for product component
     const cartOptions = {
