@@ -73,7 +73,7 @@ export default function Shop() {
                 })
                 .catch(err => console.log(err))
         }
-    }, [])
+    })
 
     //Options for product component
     const cartOptions = {
