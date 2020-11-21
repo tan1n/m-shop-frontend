@@ -73,7 +73,7 @@ export default function OrderForm({ close, user, setUser, submitOrder, total, se
                     <input
                         className="form-control"
                         type="text"
-                        name="phone"
+                        name="name"
                         placeholder="Name"
                         onChange={setUser}
                         value={user.name}

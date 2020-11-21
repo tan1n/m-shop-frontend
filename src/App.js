@@ -8,7 +8,7 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/shop/:shopId">
+        <Route exact path="/page/:pageId">
           <Shop />
         </Route>
       </Switch>

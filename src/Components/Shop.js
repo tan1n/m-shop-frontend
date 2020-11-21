@@ -8,7 +8,7 @@ import NotFound from './NotFound';
 
 export default function Shop() {
 
-    const { shopId } = useParams();
+    const { pageId } = useParams();
 
     const appId = process.env.REACT_APP_FB_APP_ID;
 
@@ -26,7 +26,7 @@ export default function Shop() {
 
     const [payment, setPayment] = useState({ transaction_id: '', payment_type: '', payment_no: '' })
 
-    const shopUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/products`;
+    const shopUrl = process.env.REACT_APP_API_URL + `page/${pageId}/products`;
 
     const [isLoading, setIsLoading] = useState({ status: false, msg: '' });
 
@@ -41,7 +41,7 @@ export default function Shop() {
                 setShop(data);
             })
             .catch((err) => setError((error) => true));
-    }, [shopId, shopUrl]);
+    }, [pageId, shopUrl]);
 
     //Set `isComplete` button to disabled depending on cart changes
     useEffect(() => {
@@ -54,8 +54,8 @@ export default function Shop() {
         //Messenger extension is loaded 
         window.extAsyncInit = () => {
             window.MessengerExtensions.getContext(appId, (context) => {
-                customerUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/customer/${context.psid}`
-            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `shop/${shopId}/customer/123` })
+                customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/${context.psid}`
+            }, (err) => { console.log(err); customerUrl = process.env.REACT_APP_API_URL + `page/${pageId}/customer/123` })
 
             //Get profile
             fetch(customerUrl)
@@ -129,7 +129,7 @@ export default function Shop() {
             customer: { ...user },
             purchases: countProducts(cart),
             paymentInfo: { ...payment },
-            shopId: shop.id
+            pageId: pageId
         }
 
         //Api url
@@ -150,7 +150,7 @@ export default function Shop() {
             .then(({ data }) => {
                 //If order is successfully posted
                 console.log(data)
-                if (data === 'Success') {
+                if (data) {
                     setIsLoading({ status: false, msg: 'Order Place successfully' })
                     setInterval(() => {
                         window.MessengerExtensions.requestCloseBrowser(function success() {
