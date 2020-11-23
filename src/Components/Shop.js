@@ -62,7 +62,7 @@ export default function Shop() {
                         return {
                             ...prev,
                             name: data.name,
-                            psId: data.id,
+                            psId: data.psId,
                             profile_pic: data.profile_pic
                         }
                     })
