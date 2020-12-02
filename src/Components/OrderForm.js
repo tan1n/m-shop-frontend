@@ -9,7 +9,7 @@ export default function OrderForm({ close, user, setUser, submitOrder, total, se
     const [openPaymentNo, setOpenPaymentNo] = useState(false)
 
     useEffect(() => {
-        if (isLoading.status) toast(isLoading.msg);
+        if (isLoading.msg !== '') toast(isLoading.msg);
     }, [isLoading])
 
     const setPaymentType = (e) => {
